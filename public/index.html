@@ -900,7 +900,32 @@
       .catch(() => {
           window.location.href = "/user";
       });
+      fetch('/api/sidebar-menu')
+    .then(res => res.json())
+    .then(menus => {
+        const sidebarContainer = document.getElementById("nav-sidebar"); // Hubi ID-ga container-kaaga
+        let html = '';
 
+        menus.forEach(menu => {
+            // Halkii ay ka ahayd menu.pr_id ka dhig menu.prid
+                    html += `
+                    <li class="nav-item">
+                        <a data-toggle="collapse" href="#menu-${menu.prid}"> <i class="${menu.icon}"></i>
+                            <p>${menu.name}</p>
+                            <span class="caret"></span>
+                        </a>
+                        <div class="collapse" id="menu-${menu.prid}"> ...
+                        </div>
+                    </li>`;
+                        `).join('')}
+                    </ul>
+                </div>
+            </li>`;
+        });
+
+        sidebarContainer.innerHTML = html;
+    })
+    .catch(err => console.error("Error loading sidebar:", err));
     </script>
   </body>
 </html>
