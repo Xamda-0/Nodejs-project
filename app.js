@@ -80,22 +80,22 @@ app.get("/logout",(req,res)=>{
     req.session.destroy(()=>res.redirect("/user"))
 }) // end of logout
 
-// routes/dashboard.js tusaale
-app.get("/api/tables", async (req, res) => {
-  try {
-    const [rows] = await db.query(
-      "SELECT table_name FROM information_schema.tables WHERE table_schema = 'staff_system'"
-    );
-    res.json(rows);
-  } catch (err) {
-    res.status(500).json(err);
-  }
-});
-app.get("/dashboard/table/:name", async (req, res) => {
-  const table = req.params.name;
+// // routes/dashboard.js tusaale
+// app.get("/api/tables", async (req, res) => {
+//   try {
+//     const [rows] = await db.query(
+//       "SELECT table_name FROM information_schema.tables WHERE table_schema = 'staff_system'"
+//     );
+//     res.json(rows);
+//   } catch (err) {
+//     res.status(500).json(err);
+//   }
+// });
+// app.get("/dashboard/table/:name", async (req, res) => {
+//   const table = req.params.name;
 
-  const [rows] = await db.query(`SELECT * FROM ${table}`);
-  res.render("table-view", { table, rows });
-});
+//   const [rows] = await db.query(`SELECT * FROM ${table}`);
+//   res.render("table-view", { table, rows });
+// });
 
 app.listen(5000)
