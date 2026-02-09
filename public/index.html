@@ -597,8 +597,8 @@
             <nav class="pull-left">
               <ul class="nav">
                 <li class="nav-item">
-                  <a class="nav-link" href="http://www.themekita.com">
-                    ThemeKita
+                  <a class="nav-link" href="https://xamda-project.netlify.app/">
+                    Xamda Cumar
                   </a>
                 </li>
                 <li class="nav-item">
@@ -611,7 +611,7 @@
             </nav>
             <div class="copyright">
               2024, made with <i class="fa fa-heart heart text-danger"></i> by
-              <a href="http://www.themekita.com">ThemeKita</a>
+              <a href="https://xamda-project.netlify.app/">Xamda Cumar</a>
             </div>
             <div>
               Distributed by
@@ -879,6 +879,18 @@
         lineColor: "#ffa534",
         fillColor: "rgba(255, 165, 52, .14)",
       });
+    </script>
+    <script>
+        fetch("/api/session-user").then(res =>{
+            if(!res.ok) throw "Not Logged In"
+            return res.json();
+        })
+        .then(data =>{
+            document.getElementById("user").innerText=data.username;
+        })
+        .catch(()=>{
+            window.location.href="/user";
+        });
     </script>
   </body>
 </html>
