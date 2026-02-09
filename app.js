@@ -1,18 +1,101 @@
-const express = require("express");
-const path = require("path");
+// const express = require("express");
+// const path = require("path");
 
-const app = express();
-// const PORT = 3000;
+// const app = express();
+// // const PORT = 3000;
 
-// static files
-app.use(express.static(path.join(__dirname, "public")))
-app.get("/home", (req, res) => {
-    res.sendFile(path.join(__dirname, "public", "index.html"));
+// // static files
+// app.use(express.static(path.join(__dirname, "public")))
+// app.get("/home", (req, res) => {
+//     res.sendFile(path.join(__dirname, "public", "index.html"));
 
+// });
+
+// app.listen(3000);
+
+// // app.listen(PORT, () => {
+// //   console.log(`Server running on http://localhost:${PORT}`);
+// // });
+let express=require("express");
+let path=require("path");
+
+let my=require("mysql2");
+let session=require("express-session");
+let app=express();
+app.use(express.static("public"));
+app.use(express.urlencoded({extended:false}));
+let conn=my.createConnection({
+    host:"localhost",
+    user:"root",
+    password:"",
+    database:"staff_system"
 });
 
-app.listen(3000);
+app.use(session({
+    secret:"exm7",
+    resave:false,
+    saveUninitialized:false,
+    cookie:{secure:false,httpOnly:true}
+}));
 
-// app.listen(PORT, () => {
-//   console.log(`Server running on http://localhost:${PORT}`);
-// });
+app.get("/user",(req,res)=>{
+    res.sendFile(path.join(__dirname, "login.html"));
+})
+
+app.get("/home",(req,res)=>{
+    if(!req.session.user){
+        return res.redirect("/user")
+    }
+    res.sendFile(path.join(__dirname, "public", "index.html"))
+})
+
+app.post("/log",(req,res)=>{
+      let user=req.body.txt1
+        let pass=req.body.txt2
+    // if(user=="xamdi" && pass=="1234"){}
+        let sql="select * from users where username=? and pass=?"
+        conn.query(sql,[user,pass],(err,result)=>{
+            if(err) return res.send(err)
+            if(result.length>0){
+                req.session.user={
+                userid:result[0].uid,username:result[0].username
+                }
+                res.redirect("/home")
+            }
+            else {
+                res.send("invalid username or password")
+            }
+        }) //end of connections
+}) //end of login validation method
+app.get("/api/session-user",(req,res)=>{
+    if(!req.session.user)
+        {return res.status(401).json({loggedIn:false})
+    } // if condition
+    res.json({
+        loggedIn:true,username:req.session.user.username,
+        id:req.session.user.userid,
+    })
+})
+app.get("/logout",(req,res)=>{
+    req.session.destroy(()=>res.redirect("/user"))
+}) // end of logout
+
+// routes/dashboard.js tusaale
+app.get("/api/tables", async (req, res) => {
+  try {
+    const [rows] = await db.query(
+      "SELECT table_name FROM information_schema.tables WHERE table_schema = 'staff_system'"
+    );
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+app.get("/dashboard/table/:name", async (req, res) => {
+  const table = req.params.name;
+
+  const [rows] = await db.query(`SELECT * FROM ${table}`);
+  res.render("table-view", { table, rows });
+});
+
+app.listen(5000)
