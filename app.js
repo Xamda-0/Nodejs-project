@@ -99,5 +99,43 @@ app.get("/logout",(req,res)=>{
 //   const [rows] = await db.query(`SELECT * FROM ${table}`);
 //   res.render("table-view", { table, rows });
 // });
+// Route: /api/sidebar-menu
+app.get('/api/sidebar-menu', (req, res) => {
+    const sql = `
+        SELECT 
+            p.prid, p.prname AS parent_name, p.icon,
+            s.sub_id, s.subname AS sub_name, s.href
+        FROM privilage p
+        LEFT JOIN sub_priv s ON p.prid = s.prid
+        ORDER BY p.prid, s.sub_id;
+    `;
 
+    db.query(sql, (err, results) => {
+        if (err) return res.status(500).json(err);
+
+        const menu = [];
+        results.forEach(row => {
+            // Halkan u fiirso: Waxaan isticmaalaynaa row.prid halkii ay ka ahayd row.pr_id
+            let parent = menu.find(m => m.prid === row.prid);
+            
+            if (!parent) {
+                parent = {
+                    prid: row.prid,
+                    name: row.parent_name, // Tan waa sidii hore (Alias-ka SQL)
+                    icon: row.icon,
+                    submenus: []
+                };
+                menu.push(parent);
+            }
+
+            if (row.sub_id) {
+                parent.submenus.push({
+                    name: row.sub_name, // Tan waa sidii hore (Alias-ka SQL)
+                    href: row.href
+                });
+            }
+        });
+        res.json(menu);
+    });
+});
 app.listen(5000)
