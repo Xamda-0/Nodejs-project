@@ -110,7 +110,7 @@ app.get('/api/sidebar-menu', (req, res) => {
         ORDER BY p.prid, s.sub_id;
     `;
 
-    db.query(sql, (err, results) => {
+    conn.query(sql, (err, results) => {
         if (err) return res.status(500).json(err);
 
         const menu = [];

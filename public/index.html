@@ -92,14 +92,14 @@
                 </span>
                 
               </li>
-              <li class="nav-item">
+              <li class="nav-item" id="nav-sidebar">
                 <a data-bs-toggle="collapse" href="#base">
                   <i class="fas fa-layer-group"></i>
                   <p>base</p>
                   <span class="caret"></span>
                 </a>
                 <div class="collapse" id="base">
-                  <ul class="nav nav-collapse">
+                  <ul class="nav nav-collapse" >
                     <li>
                       <a href="components/avatars.html">
                         <span class="sub-item">Avatars</span>
@@ -852,9 +852,7 @@
     <!-- Kaiadmin JS -->
     <script src="assets/js/kaiadmin.min.js"></script>
 
-    <!-- Kaiadmin DEMO methods, don't include it in your project! -->
-    <script src="assets/js/setting-demo.js"></script>
-    <script src="assets/js/demo.js"></script>
+   
     <script>
       $("#lineChart").sparkline([102, 109, 120, 99, 110, 105, 115], {
         type: "line",
@@ -903,29 +901,36 @@
       fetch('/api/sidebar-menu')
     .then(res => res.json())
     .then(menus => {
-        const sidebarContainer = document.getElementById("nav-sidebar"); // Hubi ID-ga container-kaaga
+        // Tani waa line-ka muhiimka ah!
+        console.log("Xogta ka timid Database-ka:", menus); 
+
+        const sidebarContainer = document.getElementById("nav-sidebar"); 
         let html = '';
 
         menus.forEach(menu => {
-            // Halkii ay ka ahayd menu.pr_id ka dhig menu.prid
-                    html += `
-                    <li class="nav-item">
-                        <a data-toggle="collapse" href="#menu-${menu.prid}"> <i class="${menu.icon}"></i>
-                            <p>${menu.name}</p>
-                            <span class="caret"></span>
-                        </a>
-                        <div class="collapse" id="menu-${menu.prid}"> ...
-                        </div>
-                    </li>`;
+            // Halkan 'menu.name' wuxuu soo qori doonaa 'Registration' ama 'Finance'
+            html += `
+            <li class="nav-item">
+                <a data-bs-toggle="collapse" href="#menu-${menu.prid}">
+                    <i class="${menu.icon}"></i>
+                    <p>${menu.name}</p> 
+                    <span class="caret"></span>
+                </a>
+                <div class="collapse" id="menu-${menu.prid}">
+                    <ul class="nav nav-collapse">
+                        ${menu.submenus.map(sub => `
+                            <li>
+                                <a href="${sub.href}">
+                                    <span class="sub-item">${sub.name}</span>
+                                </a>
+                            </li>
                         `).join('')}
                     </ul>
                 </div>
             </li>`;
         });
-
         sidebarContainer.innerHTML = html;
-    })
-    .catch(err => console.error("Error loading sidebar:", err));
+    });
     </script>
   </body>
 </html>
