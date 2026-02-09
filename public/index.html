@@ -446,9 +446,10 @@
                     href="#"
                     aria-expanded="false"
                   >
-                    <div class="avatar-sm">
+                    <div  class="avatar-sm">
                       <img
-                        src="assets/img/farhia.jpeg"
+                        id="user-img-top"
+                        src="assets/img/default.jpg"
                         alt="..."
                         class="avatar-img rounded-circle"
                       />
@@ -464,7 +465,8 @@
                         <div class="user-box">
                           <div class="avatar-lg">
                             <img
-                              src="assets/img/farhia.jpeg"
+                              id="user-img-dropdown"
+                              src="assets/img/default.jpg"
                               alt="image profile"
                               class="avatar-img rounded"
                             />
@@ -882,16 +884,23 @@
       });
     </script>
     <script>
-        fetch("/api/session-user").then(res =>{
-            if(!res.ok) throw "Not Logged In"
-            return res.json();
-        })
-        .then(data =>{
-            document.getElementById("user").innerText=data.username;
-        })
-        .catch(()=>{
-            window.location.href="/user";
-        });
+      fetch("/api/session-user")
+      .then(res => {
+          if(!res.ok) throw "Not Logged In";
+          return res.json();
+      })
+      .then(data => {
+          document.getElementById("user").innerText = data.username;
+          if(data.userImage) {
+              document.getElementById("user-img-top").src = data.userImage ? "/assets/img/" + data.userImage : "/assets/img/default.jpg";
+              document.getElementById("user-img-dropdown").src = data.userImage ? "/assets/img/" + data.userImage : "/assets/img/default.jpg";
+;
+          }
+      })
+      .catch(() => {
+          window.location.href = "/user";
+      });
+
     </script>
   </body>
 </html>

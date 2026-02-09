@@ -51,14 +51,15 @@ app.get("/home",(req,res)=>{
 
 app.post("/log",(req,res)=>{
       let user=req.body.txt1
-        let pass=req.body.txt2
+      let pass=req.body.txt2
+      
     // if(user=="xamdi" && pass=="1234"){}
         let sql="select * from users where username=? and pass=?"
         conn.query(sql,[user,pass],(err,result)=>{
             if(err) return res.send(err)
             if(result.length>0){
                 req.session.user={
-                userid:result[0].uid,username:result[0].username
+                userid:result[0].uid,username:result[0].username,  userImage: result[0].image
                 }
                 res.redirect("/home")
             }
@@ -74,6 +75,7 @@ app.get("/api/session-user",(req,res)=>{
     res.json({
         loggedIn:true,username:req.session.user.username,
         id:req.session.user.userid,
+        userImage:req.session.user.userImage
     })
 })
 app.get("/logout",(req,res)=>{
