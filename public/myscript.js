@@ -340,7 +340,7 @@ function openUniversalModal(tableName, idName) {
     
     // U sheeg hidden inputs-ka xogta hadda la rabo
     document.getElementById("hiddenIdName").value = idName;
-    document.getElementById("modalTitle").innerText = `Maamulka ${tableName.toUpperCase()}`;
+    document.getElementById("modalTitle").innerText = `Maamulka ${tableName}`;
     
     // Soo saar tiirarka (fields) table-kan leeyahay
     const fields = tableSchemas[tableName] || [];
@@ -348,7 +348,7 @@ function openUniversalModal(tableName, idName) {
     fields.forEach(field => {
         container.innerHTML += `
             <div class="col-md-12 mb-3">
-                <label class="form-label">${field.toUpperCase()}</label>
+                <label class="form-label">${field}</label>
                 <input type="text" class="form-control dynamic-input" id="inp_${field}" placeholder="Gali ${field}">
             </div>`;
     });

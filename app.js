@@ -181,28 +181,24 @@ app.post('/api/people/execute', async (req, res) => {
 app.post('/api/universal/execute', async (req, res) => {
     try {
         const { table, oper, idName, idVal, data } = req.body;
-        let cols = "";
-        let vals = "";
 
-        if (oper === 'insert') {
-            cols = Object.keys(data).join(', ');
-            vals = Object.values(data).map(v => `'${v}'`).join(', ');
-        } else if (oper === 'update') {
-            vals = Object.entries(data).map(([k, v]) => `${k}='${v}'`).join(', ');
-        }
+        // Hubi in xogta ay soo gaartay server-ka (Debug)
+        console.log("Processing Table:", table, "Operation:", oper);
 
-        // Halkan ayaan ka dhigay 'conn' sida aad codsatay
-        await conn.execute(
-            'CALL sp_UniversalCRUD(?, ?, ?, ?, ?, ?)',
-            [table, oper, cols, vals, idName, idVal || 0]
-        );
+        // U diyaari Columns-ka iyo Values-ka si nadiif ah
+        const cols = Object.keys(data).join(',');
+        // Values-ka halkan ayaan hal-hal ugu xireynaa (Single Quotes)
+        const vals = Object.values(data).map(v => `'${v}'`).join(',');
 
-        return res.status(200).json({ success: true, message: "Guul!" });
+        // Wac Procedure-ka
+        const sql = "CALL sp_UniversalCRUD(?, ?, ?, ?, ?, ?)";
+        const [result] = await conn.query(sql, [table, oper, cols, vals, idName, idVal || 0]);
 
+        res.json({ success: true, message: "Si guul leh ayay u dhacday!" });
     } catch (err) {
-        // Kani wuxuu kaa badbaadinayaa 'Unhandled error event' crash-ka
-        console.error("SQL ERROR:", err.sqlMessage || err.message); 
-        return res.status(500).json({ success: false, message: err.message });
+        // Kani wuxuu kuu sheegayaa sababta dhabta ah ee 500 u dhacay
+        console.error("SQL Error Details:", err.sqlMessage || err.message);
+        res.status(500).json({ success: false, error: err.sqlMessage || err.message });
     }
 });
 app.listen(5000, () => {
