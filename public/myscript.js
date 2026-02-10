@@ -47,41 +47,7 @@
         sidebarContainer.innerHTML = html;
     });
 
-function loadPeopleTable() {
-    const tbody = document.getElementById("people-table-body");
-    
-    fetch('/api/people/execute', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ oper: 'select', num: 0 })
-    })
-    .then(res => res.json())
-    .then(res => {
-        if (res.success && res.data) {
-            tbody.innerHTML = res.data.map(p => `
-                <tr>
-                    <td>${p.p_no}</td>
-                    <td>${p.name}</td>
-                    <td>${p.tell}</td>
-                    <td>${p.birthDate}</td>
-                    <td>${p.placeBirth}</td>
-                    <td>${p.add_no}</td>
-                    <td>${p.gmail}</td>
-                    <td>${p.regdate}</td>
-                    <td>
-                        <button class="btn btn-sm btn-warning" onclick="prepareEdit(${p.p_no})">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        
-                        <button class="btn btn-sm btn-danger" onclick="deletePeople(${p.p_no})">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </td>
-                </tr>
-            `).join('');
-        }
-    });
-}
+
 function toggleTable() {
     const container = document.getElementById("table-container");
     
@@ -150,61 +116,36 @@ function fillAddressCombo() {
         })
         .catch(err => console.error("Error fillAddressCombo:", err));
 }
-//     // 1. U dir 'select' iyo ID-ga gaarka ah (num) Procedure-ka
-//     fetch('/api/people/execute', {
-//         method: 'POST',
-//         headers: { 'Content-Type': 'application/json' },
-//         body: JSON.stringify({ oper: 'select', num: id })
-//     })
-//     .then(res => res.json())
-//     .then(res => {
-//         if (res.success && res.data.length > 0) {
-//             const person = res.data[0];
+function loadPeopleTable() {
+    const tbody = document.getElementById("people-table-body");
+    
+    fetch('/api/people/execute', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ oper: 'select', num: 0 }) //
+    })
+    .then(res => res.json())
+    .then(res => {
+        if (res.success && res.data) {
+            tbody.innerHTML = res.data.map(p => {
+                // Formatting Date si ay u ekaato DD/MM/YYYY
+                const bDate = p.birthDate ? new Date(p.birthDate).toLocaleDateString() : '';
+                const rDate = p.regdate ? new Date(p.regdate).toLocaleDateString() : '';
+                return `
+                <tr style="font-size: 13px;">
+                    <td>${p.p_no}</td>
+                    <td>${p.name}</td>
+                    <td>${p.tell}</td>
+                    <td>${bDate}</td> <td>${p.placeBirth}</td> <td>${p.add_no}</span></td> <td>${p.gmail}</td><td>${rDate}</td> 
+                   <td>
+                        <button class="btn btn-sm btn-danger" onclick="deletePeople(${p.p_no})">Delete</button>
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+    });
+}
 
-//             setTimeout(() => {
-//                 document.getElementById("num").value = person.p_no;
-//                 document.getElementById("pname").value = person.name;
-//                 document.getElementById("phone").value = person.tell;
-//                 document.getElementById("psex").value = person.sex;
-
-//                 if (person.birthDate) {
-//                     const bDate = new Date(person.birthDate).toISOString().split('T')[0];
-//                     document.getElementById("birDate").value = bDate;
-//                 }
-
-//                 document.getElementById("plbirth").value = person.placeBirth;
-//                 document.getElementById("addno").value = person.add_no;
-//                 document.getElementById("pgmail").value = person.gmail;
-//             }, 100);
-
-
-//             // // 2. Ku shub xogta Form-ka
-//             // document.getElementById("num").value = person.p_no; // ID-ga qarsoon
-//             // document.getElementById("pname").value = person.name;
-//             // document.getElementById("phone").value = person.tell;
-//             // document.getElementById("psex").value = person.sex;
-            
-//             // // Format Date (YYYY-MM-DD) waayo input type="date" ayaa sidaas raba
-//             // const bDate = new Date(person.birthDate).toISOString().split('T')[0];
-//             // document.getElementById("birDate").value = bDate;
-            
-//             // document.getElementById("plbirth").value = person.placeBirth;
-//             // document.getElementById("addno").value = person.add_no;
-//             // document.getElementById("pgmail").value = person.gmail;
-
-//             // // 3. Beddel batoonka si uu u muujiyo "Update" halkii uu ka ahaan lahaa "Keydi"
-//             // const saveBtn = document.querySelector("#peopleForm button");
-//             // saveBtn.innerHTML = '<i class="fas fa-edit"></i> Beddel Xogta';
-//             // saveBtn.className = "btn btn-warning px-5";
-//             // saveBtn.onclick = () => savePeople('update'); // Beddel action-ka
-            
-//             // U kaxay qofka xaga sare ee Form-ka
-//             window.scrollTo(0, 0);
-//         }
-//     })
-//     .catch(err => console.error("Error fetching person details:", err));
-// }
-// function editFromSearch() {
 //     const id = document.getElementById("searchId").value;
 //     console.log("ID =", id);
 
@@ -232,7 +173,7 @@ function fillAddressCombo() {
 //     prepareEdit(id);
 // }
 // document.getElementById("searchBtn").addEventListener("click", editFromSearch);
-function searchAndEdit() {
+function searchAndEdit(id) {
     // 1. Qabo ID-ga uu qofku ku qoray Search-ka sare
     const searchId = document.querySelector('input[placeholder="Search ..."]').value;
 
@@ -358,15 +299,16 @@ function deletePeople(id) {
         fetch('/api/people/execute', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ oper: 'delete', num: id })
+            body: JSON.stringify({ oper: 'delete', num: id }) //
         })
         .then(res => res.json())
         .then(res => {
             if (res.success) {
-                alert(res.message); // Waxay soo muujinaysaa "Deleted successfully"
-                loadPeopleTable(); // Isla markiiba Table-ka cusub soo saar
+                alert(res.message); // Wuxuu soo celinayaa fariintii Procedure-ka (e.g. "Deleted successfully")
+                loadPeopleTable(); // Cusboonaysii table-ka
             }
-        });
+        })
+        .catch(err => console.error("Error delete:", err));
     }
 }
 
