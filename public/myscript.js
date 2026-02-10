@@ -46,59 +46,51 @@
         });
         sidebarContainer.innerHTML = html;
     });
-//     function loadPeopleTable() {
-//     const tbody = document.getElementById("people-table-body");
 
-//     fetch('/api/people/execute', {
-//         method: 'POST',
-//         headers: { 'Content-Type': 'application/json' },
-//         body: JSON.stringify({ oper: 'select', num: 0 }) //
-//     })
-//     .then(res => res.json())
-//     .then(res => {
-//         if (res.success && res.data) {
-//             tbody.innerHTML = res.data.map(p => `
-//                 <tr>
-//                     <td>${p.p_no}</td>
-//                     <td>${p.name}</td>
-//                     <td>${p.tell}</td>
-//                     <td>${p.sex}</td>
-//                     <td>${p.gmail}</td>
-//                     <td>
-//                         <button class="btn btn-sm btn-info" onclick="prepareEdit(${p.p_no})">Edit</button>
-//                         <button class="btn btn-sm btn-danger" onclick="deletePeople(${p.p_no})">Delete</button>
-//                     </td>
-//                 </tr>
-//             `).join('');
-//         }
-//     });
-// }
 function loadPeopleTable() {
     const tbody = document.getElementById("people-table-body");
     
     fetch('/api/people/execute', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ oper: 'select', num: 0 }) //
+        body: JSON.stringify({ oper: 'select', num: 0 })
     })
     .then(res => res.json())
     .then(res => {
         if (res.success && res.data) {
-            tbody.innerHTML = res.data.map(p => {
-                // Formatting Date si ay u ekaato DD/MM/YYYY
-                const bDate = p.birthDate ? new Date(p.birthDate).toLocaleDateString() : '';
-                const rDate = p.regdate ? new Date(p.regdate).toLocaleDateString() : '';
-                return `
-                <tr style="font-size: 13px;">
+            tbody.innerHTML = res.data.map(p => `
+                <tr>
                     <td>${p.p_no}</td>
                     <td>${p.name}</td>
                     <td>${p.tell}</td>
-                    <td>${bDate}</td> <td>${p.placeBirth}</td> <td>${p.add_no}</span></td> <td>${p.gmail}</td><td>${rDate}</td> 
-                   
-                </tr>`;
-            }).join('');
+                    <td>${p.birthDate}</td>
+                    <td>${p.placeBirth}</td>
+                    <td>${p.add_no}</td>
+                    <td>${p.gmail}</td>
+                    <td>${p.regdate}</td>
+                    <td>
+                        <button class="btn btn-sm btn-warning" onclick="prepareEdit(${p.p_no})">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        
+                        <button class="btn btn-sm btn-danger" onclick="deletePeople(${p.p_no})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
         }
     });
+}
+function toggleTable() {
+    const container = document.getElementById("table-container");
+    
+    if (container.style.display === "none") {
+        container.style.display = "block"; // Muuji table-ka
+        loadPeopleTable(); // Isla markiiba soo rari xogta
+    } else {
+        container.style.display = "none"; // Qari haddii uu furnaa
+    }
 }
     function navigateTo(url) {
     const mainContent = document.getElementById("dynamic-content");
@@ -158,48 +150,6 @@ function fillAddressCombo() {
         })
         .catch(err => console.error("Error fillAddressCombo:", err));
 }
-// function prepareEdit(id) {
-//     fetch('/api/people/execute', {
-//         method: 'POST',
-//         headers: { 'Content-Type': 'application/json' },
-//         body: JSON.stringify({ oper: 'select', num: id }) // Procedure-kaaga qaybtiisa select
-//     })
-//     .then(res => res.json())
-//     .then(res => {
-//         if (res.success && res.data.length > 0) {
-//             const person = res.data[0];
-
-//             // 1. Buuxi xogta Form-ka
-//             document.getElementById("num").value = person.p_no; // Aad u muhiim ah!
-//             document.getElementById("pname").value = person.name;
-//             document.getElementById("phone").value = person.tell;
-//             document.getElementById("psex").value = person.sex;
-//             document.getElementById("plbirth").value = person.placeBirth;
-//             document.getElementById("pgmail").value = person.gmail;
-//             document.getElementById("addno").value = person.add_no; // Hubi inuu yahay ID-ga
-
-//             // 2. Sax Date-ka (YYYY-MM-DD)
-//             if (person.birthDate) {
-//                 const date = new Date(person.birthDate);
-//                 const formattedDate = date.toISOString().split('T')[0];
-//                 document.getElementById("birDate").value = formattedDate;
-//             }
-
-//             // 3. U beddel batoonka 'Update' si hubaal ah
-//             const btn = document.querySelector("#peopleForm button");
-//             btn.innerHTML = '<i class="fas fa-edit"></i> Beddel Xogta';
-//             btn.className = "btn btn-warning px-5";
-            
-//             // Halkan ayaad ka wacaysaa savePeople oo 'update' ah
-//             btn.setAttribute("onclick", "savePeople('update')"); 
-
-//             // Kor u qaad bogga
-//             window.scrollTo({ top: 0, behavior: 'smooth' });
-//         }
-//     });
-// }
-
-// function prepareEdit(id) {
 //     // 1. U dir 'select' iyo ID-ga gaarka ah (num) Procedure-ka
 //     fetch('/api/people/execute', {
 //         method: 'POST',
@@ -361,14 +311,6 @@ function savePeople(operation) {
         form.classList.add('was-validated');
         return;
     }
-    // const id = document.getElementById("num").value;
-    
-    // // Haddii operation uu yahay update laakiin ID-gu yahay 0, dhib ayaa jira
-    // if (operation === 'update' && (id === "0" || id === "")) {
-    //     alert("Cilad: Ma dooran qof aad wax ka beddesho!");
-    //     return;
-    // }
-
     const formData = {
         pname: document.getElementById("pname").value,
         phone: document.getElementById("phone").value,
@@ -394,11 +336,9 @@ function savePeople(operation) {
         const msg = res.message;
 
         if (msg.includes('successfully')) {
-            alert("Guul: " + msg);
+            alert( msg);
 
-            // if (operation === "insert") {
                 form.reset();
-            // }
 
             loadPeopleTable()
             form.classList.remove('was-validated');
@@ -413,7 +353,21 @@ function savePeople(operation) {
 
     .catch(err => console.error("Error:", err));
 }
-
-// fillAddressCombo();
+function deletePeople(id) {
+    if (confirm("Ma hubtaa inaad tirtirto qofkan?")) {
+        fetch('/api/people/execute', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ oper: 'delete', num: id })
+        })
+        .then(res => res.json())
+        .then(res => {
+            if (res.success) {
+                alert(res.message); // Waxay soo muujinaysaa "Deleted successfully"
+                loadPeopleTable(); // Isla markiiba Table-ka cusub soo saar
+            }
+        });
+    }
+}
 
 
