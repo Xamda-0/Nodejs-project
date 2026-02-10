@@ -396,7 +396,6 @@ async function saveData() {
     const idVal = document.getElementById("hiddenIdVal").value;
     const oper = (idVal == "0") ? "insert" : "update";
 
-    // Ururi dhamaan xogta ay qofku qoreen
     const data = {};
     document.querySelectorAll(".dynamic-input").forEach(input => {
         const fieldName = input.id.replace("inp_", "");
@@ -404,38 +403,40 @@ async function saveData() {
     });
 
     const body = {
-        table: currentTable,
+        table: currentTable, // Hubi in kan lagu soo qabto openModal()
         oper: oper,
         idName: idName,
         idVal: idVal,
         data: data
     };
 
-    const response = await fetch('/api/universal/execute', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
-    });
+    try {
+        const response = await fetch('/api/universal/execute', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
 
-    const res = await response.json();
-    if (res.success) {
-        alert("Si guul leh ayaa loo kaydiyay!");
-          // 1. Marka hore soo qabo Modal-ka hadda furan
-        const modalElement = document.getElementById('universalModal');
-        const modalInstance = bootstrap.Modal.getInstance(modalElement);
-        
-        // 2. Si sax ah u xir Modal-ka (Tani waxay meesha ka saaraysaa aria-hidden error)
-        modalInstance.hide();
+        const res = await response.json();
+        if (res.success) {
+            alert("Si guul leh ayaa loo kaydiyay!");
+            
+            // 1. Xir Modal-ka
+            const modalElement = document.getElementById('universalModal');
+            const modalInstance = bootstrap.Modal.getInstance(modalElement);
+            if (modalInstance) modalInstance.hide();
 
-        // 3. Nadiifi Focus-ka batoonka
-        document.activeElement.blur();
+            // 2. Nadiifi Focus-ka
+            document.activeElement.blur();
 
-        // 4. Dib u rari Table-ka (Hubi in Server-kaagu uu hadda shidan yahay)
-        loadDynamicTable(currentTable, idName, 'tableContainer');
-        bootstrap.Modal.getInstance(document.getElementById('universalModal')).hide();
-        loadDynamicTable(currentTable, idName, 'tableContainer'); // Dib u rari table-ka
+            // 3. Dib u rari Table-ka (KALIYA HAL JEER WAC)
+            loadDynamicTable(currentTable, idName, 'tableContainer');
+        } else {
+            alert("Error: " + res.error); // U sheeg qofka haddii SQL syntax dhaco
+        }
+    } catch (err) {
+        console.error("SaveData Error:", err);
     }
- 
 }
 
 

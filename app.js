@@ -182,22 +182,22 @@ app.post('/api/universal/execute', async (req, res) => {
     try {
         const { table, oper, idName, idVal, data } = req.body;
 
-        // Hubi in xogta ay soo gaartay server-ka (Debug)
-        console.log("Processing Table:", table, "Operation:", oper);
+        // 1. Hubi haddii magaca table-ka uu maqan yahay
+        if (!table) {
+            return res.status(400).json({ success: false, error: "Magaca table-ka waa lagama maarmaan!" });
+        }
 
-        // U diyaari Columns-ka iyo Values-ka si nadiif ah
+        console.log(`Executing ${oper} on table: ${table}`);
+
         const cols = Object.keys(data).join(',');
-        // Values-ka halkan ayaan hal-hal ugu xireynaa (Single Quotes)
         const vals = Object.values(data).map(v => `'${v}'`).join(',');
 
-        // Wac Procedure-ka
         const sql = "CALL sp_UniversalCRUD(?, ?, ?, ?, ?, ?)";
         const [result] = await conn.query(sql, [table, oper, cols, vals, idName, idVal || 0]);
 
-        res.json({ success: true, message: "Si guul leh ayay u dhacday!" });
+        res.json({ success: true, message: "Si guul leh ayaa loo keydiyay" });
     } catch (err) {
-        // Kani wuxuu kuu sheegayaa sababta dhabta ah ee 500 u dhacay
-        console.error("SQL Error Details:", err.sqlMessage || err.message);
+        console.error("SQL Error Details:", err.message);
         res.status(500).json({ success: false, error: err.sqlMessage || err.message });
     }
 });
