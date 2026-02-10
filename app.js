@@ -1,29 +1,15 @@
-// const express = require("express");
-// const path = require("path");
 
-// const app = express();
-// // const PORT = 3000;
-
-// // static files
-// app.use(express.static(path.join(__dirname, "public")))
-// app.get("/home", (req, res) => {
-//     res.sendFile(path.join(__dirname, "public", "index.html"));
-
-// });
-
-// app.listen(3000);
-
-// // app.listen(PORT, () => {
-// //   console.log(`Server running on http://localhost:${PORT}`);
-// // });
 let express=require("express");
 let path=require("path");
 
 let my=require("mysql2");
 let session=require("express-session");
 let app=express();
+// Ku dar kuwan app.js xaga sare
+app.use(express.json()); 
+app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
-app.use(express.urlencoded({extended:false}));
+// app.use(express.urlencoded({extended:false}));
 let conn=my.createConnection({
     host:"localhost",
     user:"root",
@@ -82,24 +68,7 @@ app.get("/logout",(req,res)=>{
     req.session.destroy(()=>res.redirect("/user"))
 }) // end of logout
 
-// // routes/dashboard.js tusaale
-// app.get("/api/tables", async (req, res) => {
-//   try {
-//     const [rows] = await db.query(
-//       "SELECT table_name FROM information_schema.tables WHERE table_schema = 'staff_system'"
-//     );
-//     res.json(rows);
-//   } catch (err) {
-//     res.status(500).json(err);
-//   }
-// });
-// app.get("/dashboard/table/:name", async (req, res) => {
-//   const table = req.params.name;
 
-//   const [rows] = await db.query(`SELECT * FROM ${table}`);
-//   res.render("table-view", { table, rows });
-// });
-// Route: /api/sidebar-menu
 app.get('/api/sidebar-menu', (req, res) => {
     const sql = `
         SELECT 
@@ -137,5 +106,52 @@ app.get('/api/sidebar-menu', (req, res) => {
         });
         res.json(menu);
     });
+});
+// Universal Route oo loogu talagalay dhamaan boggaga dynamic-ga ah
+app.get('/pages/:pageName', (req, res) => {
+    const pageName = req.params.pageName; // Tani waxay qabanaysaa 'people', 'staff', 'job' iwm.
+    const filePath = path.join(__dirname, 'public/pages', `${pageName}.html`);
+
+    res.sendFile(filePath, (err) => {
+        if (err) {
+            console.error("Faylka lama helin:", pageName);
+            res.status(404).send("Boggaan laguma guuleysan in la helo.");
+        }
+    });
+});
+app.get('/api/get-addresses', (req, res) => {
+    // Waxaan soo xulaynaa add_no iyo inta kale oo isku duuban
+    const sql = "SELECT add_no, CONCAT(district, ' - ', village, ' (', area, ')') AS full_address FROM address";
+    conn.query(sql, (err, results) => {
+        if (err) {
+            console.error("Cilad markii xogta address la keenayay:", err);
+            return res.status(500).json({ error: "Xogta address-ka lama heli karo" });
+        }
+        res.json(results);
+    });
+});
+app.post('/api/people/execute', (req, res) => {
+    // Ka soo qaad xogta Frontend-ka
+    const { pname, phone, psex, birDate, plbirth, addno, pgmail, rgdate, oper, num } = req.body;
+
+    // Wac Procedure-ka: oper (Insert/Update/Delete), num (ID-ga loo baahan yahay)
+    const sql = "CALL people(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    
+    conn.query(sql, [pname, phone, psex, birDate, plbirth, addno, pgmail, rgdate, oper, num], (err, results) => {
+    if (err) return res.status(500).json({ success: false, error: err.message });
+
+    // Procedure-ku wuxuu soo celiyaa dhowr natiijo
+    // results[0] waa xogta (msg ama rows-ka)
+    const responseData = results[0]; 
+
+    // Haddii ay tahay Insert/Update/Delete, msg-ga ka soo saar
+    if (oper !== 'select') {
+        const message = responseData[0].msg; // Halkan ayay ku jirtaa 'Already exists' iwm.
+        res.json({ success: true, message: message });
+    } else {
+        // Haddii ay tahay select, u dir dhamaan xogta
+        res.json({ success: true, data: responseData });
+    }
+});
 });
 app.listen(5000)

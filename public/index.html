@@ -3,6 +3,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <title>Nodejs Project</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <meta
       content="width=device-width, initial-scale=1.0, shrink-to-fit=no"
       name="viewport"
@@ -177,15 +178,15 @@
                     aria-expanded="false"
                     aria-haspopup="true"
                   >
-                    <i class="fa fa-search"></i>
+                    <i class="fa fa-search" ></i>
                   </a>
                   <ul class="dropdown-menu dropdown-search animated fadeIn">
-                    <form class="navbar-left navbar-form nav-search">
-                      <div class="input-group">
+                    <form class="navbar-left navbar-form nav-search" >
+                      <div class="input-group" >
                         <input
-                          type="text"
+                          type="text" id="searchId"
                           placeholder="Search ..."
-                          class="form-control"
+                          class="form-control" 
                         />
                       </div>
                     </form>
@@ -485,11 +486,11 @@
                       <li>
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item" href="#">My Profile</a>
-                        <a class="dropdown-item" href="#">My Balance</a>
+                        <!-- <a class="dropdown-item" href="#">My Balance</a>
                         <a class="dropdown-item" href="#">Inbox</a>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="#">Account Setting</a>
-                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="#">Account Setting</a>-->
+                        <div class="dropdown-divider"></div> 
                         <a  class="dropdown-item" href="logout">Logout</a>
                         <!-- <a href="logout">Signout</a> -->
                       </li>
@@ -503,7 +504,7 @@
         </div>
 
         <div class="container">
-          <div class="page-inner">
+          <div class="page-inner" id="dynamic-content">
             
             <div class="row">
               <div class="col-sm-6 col-md-3">
@@ -881,56 +882,6 @@
         fillColor: "rgba(255, 165, 52, .14)",
       });
     </script>
-    <script>
-      fetch("/api/session-user")
-      .then(res => {
-          if(!res.ok) throw "Not Logged In";
-          return res.json();
-      })
-      .then(data => {
-          document.getElementById("user").innerText = data.username;
-          if(data.userImage) {
-              document.getElementById("user-img-top").src = data.userImage ? "/assets/img/" + data.userImage : "/assets/img/default.jpg";
-              document.getElementById("user-img-dropdown").src = data.userImage ? "/assets/img/" + data.userImage : "/assets/img/default.jpg";
-;
-          }
-      })
-      .catch(() => {
-          window.location.href = "/user";
-      });
-      fetch('/api/sidebar-menu')
-    .then(res => res.json())
-    .then(menus => {
-        // Tani waa line-ka muhiimka ah!
-        console.log("Xogta ka timid Database-ka:", menus); 
-
-        const sidebarContainer = document.getElementById("nav-sidebar"); 
-        let html = '';
-
-        menus.forEach(menu => {
-            // Halkan 'menu.name' wuxuu soo qori doonaa 'Registration' ama 'Finance'
-            html += `
-            <li class="nav-item">
-                <a data-bs-toggle="collapse" href="#menu-${menu.prid}">
-                    <i class="${menu.icon}"></i>
-                    <p>${menu.name}</p> 
-                    <span class="caret"></span>
-                </a>
-                <div class="collapse" id="menu-${menu.prid}">
-                    <ul class="nav nav-collapse">
-                        ${menu.submenus.map(sub => `
-                            <li>
-                                <a href="${sub.href}">
-                                    <span class="sub-item">${sub.name}</span>
-                                </a>
-                            </li>
-                        `).join('')}
-                    </ul>
-                </div>
-            </li>`;
-        });
-        sidebarContainer.innerHTML = html;
-    });
-    </script>
+    <script src="myscript.js"></script>
   </body>
 </html>
