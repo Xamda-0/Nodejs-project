@@ -122,28 +122,36 @@ function loadPeopleTable() {
     fetch('/api/people/execute', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ oper: 'select', num: 0 }) //
+        body: JSON.stringify({ oper: 'select', num: 0 }) 
     })
     .then(res => res.json())
     .then(res => {
         if (res.success && res.data) {
             tbody.innerHTML = res.data.map(p => {
-                // Formatting Date si ay u ekaato DD/MM/YYYY
+                // Formatting Date
                 const bDate = p.birthDate ? new Date(p.birthDate).toLocaleDateString() : '';
                 const rDate = p.regdate ? new Date(p.regdate).toLocaleDateString() : '';
+                
                 return `
                 <tr style="font-size: 13px;">
                     <td>${p.p_no}</td>
                     <td>${p.name}</td>
                     <td>${p.tell}</td>
-                    <td>${bDate}</td> <td>${p.placeBirth}</td> <td>${p.add_no}</span></td> <td>${p.gmail}</td><td>${rDate}</td> 
-                   <td>
-                        <button class="btn btn-sm btn-danger" onclick="deletePeople(${p.p_no})">Delete</button>
+                    <td>${bDate}</td> 
+                    <td>${p.placeBirth}</td> 
+                    <td>${p.address_name}</td> 
+                    <td>${p.gmail}</td>
+                    <td>${rDate}</td> 
+                    <td>
+                        <button class="btn btn-sm btn-danger" onclick="deletePeople(${p.p_no})">
+                            <i class="fa fa-trash"></i> Delete
+                        </button>
                     </td>
                 </tr>`;
             }).join('');
         }
-    });
+    })
+    .catch(err => console.error("Error loading people:", err));
 }
 
 //     const id = document.getElementById("searchId").value;
@@ -301,9 +309,6 @@ function deletePeople(id) {
         .catch(err => console.error("Error delete:", err));
     }
 }
-
-
-
 function showForm() {
     const formContainer = document.getElementById("registration-form-container");
     
@@ -317,4 +322,161 @@ function showForm() {
         // Haddii aad rabto inaad dib u qariso marka mar kale la riixo
         formContainer.style.display = "none";
     }
+}
+let currentTable = ""; // Table-ka hadda la furay
+// 1. Qeex xogta table- walba (Schemas)
+const tableSchemas = {
+    'job': ['title', 'salary'],
+    'degree': ['degname', 'description'],
+    'country': ['contName', 'stateName', 'city'],
+    'status': ['stname'],
+    'specialization': ['spname', 'description']
+};
+
+// 2. Function-ka furaya Modal-ka
+function openUniversalModal(tableName, idName) {
+    const container = document.getElementById("dynamicInputs");
+    container.innerHTML = ""; // Nadiifi wixii hore
+    
+    // U sheeg hidden inputs-ka xogta hadda la rabo
+    document.getElementById("hiddenIdName").value = idName;
+    document.getElementById("modalTitle").innerText = `Maamulka ${tableName.toUpperCase()}`;
+    
+    // Soo saar tiirarka (fields) table-kan leeyahay
+    const fields = tableSchemas[tableName] || [];
+    
+    fields.forEach(field => {
+        container.innerHTML += `
+            <div class="col-md-12 mb-3">
+                <label class="form-label">${field.toUpperCase()}</label>
+                <input type="text" class="form-control dynamic-input" id="inp_${field}" placeholder="Gali ${field}">
+            </div>`;
+    });
+
+    // Fur Modal-ka
+    const myModal = new bootstrap.Modal(document.getElementById('universalModal'));
+    myModal.show();
+}
+
+async function loadDynamicTable(tableName, idName, containerId) {
+    const response = await fetch('/api/universal/execute', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ table: tableName, oper: 'select', idName: idName, idVal: 0, data: {} })
+    });
+
+    const res = await response.json();
+    if (res.success && res.data.length > 0) {
+        const columns = Object.keys(res.data[0]); // Iskiis u hel tiirarka
+
+        let html = `
+        <table class="table table-hover">
+            <thead class="bg-dark text-white">
+                <tr>
+                    ${columns.map(col => `<th>${col.toUpperCase()}</th>`).join('')}
+                    <th>ACTION</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${res.data.map(row => `
+                <tr>
+                    ${columns.map(col => `<td>${row[col]}</td>`).join('')}
+                    <td>
+                        <button class="btn btn-sm btn-info" onclick="editRow('${tableName}', '${idName}', ${row[idName]})"><i class="fas fa-edit"></i></button>
+                    </td>
+                </tr>`).join('')}
+            </tbody>
+        </table>`;
+        document.getElementById(containerId).innerHTML = html;
+    }
+}
+
+async function saveData() {
+    const idName = document.getElementById("hiddenIdName").value;
+    const idVal = document.getElementById("hiddenIdVal").value;
+    const oper = (idVal == "0") ? "insert" : "update";
+
+    // Ururi dhamaan xogta ay qofku qoreen
+    const data = {};
+    document.querySelectorAll(".dynamic-input").forEach(input => {
+        const fieldName = input.id.replace("inp_", "");
+        data[fieldName] = input.value;
+    });
+
+    const body = {
+        table: currentTable,
+        oper: oper,
+        idName: idName,
+        idVal: idVal,
+        data: data
+    };
+
+    const response = await fetch('/api/universal/execute', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+    });
+
+    const res = await response.json();
+    if (res.success) {
+        alert("Si guul leh ayaa loo kaydiyay!");
+          // 1. Marka hore soo qabo Modal-ka hadda furan
+        const modalElement = document.getElementById('universalModal');
+        const modalInstance = bootstrap.Modal.getInstance(modalElement);
+        
+        // 2. Si sax ah u xir Modal-ka (Tani waxay meesha ka saaraysaa aria-hidden error)
+        modalInstance.hide();
+
+        // 3. Nadiifi Focus-ka batoonka
+        document.activeElement.blur();
+
+        // 4. Dib u rari Table-ka (Hubi in Server-kaagu uu hadda shidan yahay)
+        loadDynamicTable(currentTable, idName, 'tableContainer');
+        bootstrap.Modal.getInstance(document.getElementById('universalModal')).hide();
+        loadDynamicTable(currentTable, idName, 'tableContainer'); // Dib u rari table-ka
+    }
+ 
+}
+
+
+
+function openModal(tableName, idName, data = null) {
+    currentTable = tableName;
+    document.getElementById("modalTitle").innerText = `Maamulka ${tableName.toUpperCase()}`;
+    document.getElementById("hiddenIdName").value = idName;
+    
+    const inputContainer = document.getElementById("dynamicInputs");
+    inputContainer.innerHTML = ""; // Nadiifi wixii hore
+
+    // 1. Haddii aanay xog jirin (New Insert), soo aqri column-yada meel kale ama manual
+    // Halkan waxaan ka soo qaadanaynaa "Keys" haddii ay xog jirto ama qaab manual ah
+    const fields = data ? Object.keys(data) : getFieldsForTable(tableName);
+
+    fields.forEach(field => {
+        // PK-ga ha u samayn input muuqda
+        if (field !== idName) {
+            inputContainer.innerHTML += `
+                <div class="mb-3">
+                    <label class="form-label">${field.toUpperCase()}</label>
+                    <input type="text" class="form-control dynamic-input" id="inp_${field}" 
+                           value="${data ? data[field] : ''}">
+                </div>`;
+        } else if (data) {
+            document.getElementById("hiddenIdVal").value = data[idName];
+        }
+    });
+
+    const myModal = new bootstrap.Modal(document.getElementById('universalModal'));
+    myModal.show();
+}
+
+// Function-kan wuxuu kuu fududaynayaa inaad u sheegto table walba waxa uu leeyahay
+function getFieldsForTable(table) {
+    const schemas = {
+        'jobs': ['title', 'salary'],
+        'degree': ['degname', 'description'],
+        'country': ['contName', 'stateName', 'city'],
+        'status': ['stname']
+    };
+    return schemas[table] || [];
 }
