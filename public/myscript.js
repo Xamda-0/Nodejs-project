@@ -46,9 +46,36 @@
         });
         sidebarContainer.innerHTML = html;
     });
-    function loadPeopleTable() {
-    const tbody = document.getElementById("people-table-body");
+//     function loadPeopleTable() {
+//     const tbody = document.getElementById("people-table-body");
 
+//     fetch('/api/people/execute', {
+//         method: 'POST',
+//         headers: { 'Content-Type': 'application/json' },
+//         body: JSON.stringify({ oper: 'select', num: 0 }) //
+//     })
+//     .then(res => res.json())
+//     .then(res => {
+//         if (res.success && res.data) {
+//             tbody.innerHTML = res.data.map(p => `
+//                 <tr>
+//                     <td>${p.p_no}</td>
+//                     <td>${p.name}</td>
+//                     <td>${p.tell}</td>
+//                     <td>${p.sex}</td>
+//                     <td>${p.gmail}</td>
+//                     <td>
+//                         <button class="btn btn-sm btn-info" onclick="prepareEdit(${p.p_no})">Edit</button>
+//                         <button class="btn btn-sm btn-danger" onclick="deletePeople(${p.p_no})">Delete</button>
+//                     </td>
+//                 </tr>
+//             `).join('');
+//         }
+//     });
+// }
+function loadPeopleTable() {
+    const tbody = document.getElementById("people-table-body");
+    
     fetch('/api/people/execute', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -57,19 +84,19 @@
     .then(res => res.json())
     .then(res => {
         if (res.success && res.data) {
-            tbody.innerHTML = res.data.map(p => `
+            tbody.innerHTML = res.data.map(p => {
+                // Formatting Date si ay u ekaato DD/MM/YYYY
+                const bDate = p.birthDate ? new Date(p.birthDate).toLocaleDateString() : '';
+                const rDate = p.regdate ? new Date(p.regdate).toLocaleDateString() : '';
+                return `
                 <tr>
                     <td>${p.p_no}</td>
                     <td>${p.name}</td>
                     <td>${p.tell}</td>
-                    <td>${p.sex}</td>
-                    <td>${p.gmail}</td>
-                    <td>
-                        <button class="btn btn-sm btn-info" onclick="prepareEdit(${p.p_no})">Edit</button>
-                        <button class="btn btn-sm btn-danger" onclick="deletePeople(${p.p_no})">Delete</button>
-                    </td>
-                </tr>
-            `).join('');
+                    <td>${bDate}</td> <td>${p.placeBirth}</td> <td><span class="badge bg-secondary">${p.add_no}</span></td> <td>${p.gmail}</td><td><small class="text-muted">${rDate}</small></td> <td>
+                   
+                </tr>`;
+            }).join('');
         }
     });
 }
@@ -97,6 +124,7 @@
             if (url.includes('people')) {
                 setTimeout(() => {
                     fillAddressCombo();
+                    loadPeopleTable()
                 }, 150); // 150ms ayaa ku filan inuu element-ku soo baxo
             }
         })
@@ -372,7 +400,7 @@ function savePeople(operation) {
                 form.reset();
             // }
 
-            loadPeopleTable();
+            loadPeopleTable()
             form.classList.remove('was-validated');
 
         } else if (msg.includes('exists')) {
