@@ -1,71 +1,91 @@
-<form id="peopleForm" class="needs-validation" novalidate>
-    <input type="hidden" id="num" value="0">
-    <div class="row g-3">
-        <div class="col-md-6">
-            <label class="form-label">Magaca oo Buuxa</label>
-            <input type="text" id="pname" class="form-control" placeholder="Tusaale: Maxamed Cali" required>
-            <div class="invalid-feedback">Fadlan magaca geli.</div>
-        </div>
+<div class="mb-4">
+    <button class="btn btn-success" onclick="showForm()">
+        <i class="fas fa-plus"></i> Add People
+    </button>
+     <button type="button" class="btn btn-secondary px-4 ms-2" onclick="toggleTable()">
+        <i class="fas fa-table"></i> Show Table
+      </button>
 
-        <div class="col-md-6">
-            <label class="form-label">Telefoonka</label>
-            <input type="number" id="phone" class="form-control" placeholder="061xxxxxxx" required>
-            <div class="invalid-feedback">Fadlan telefoonka geli.</div>
-        </div>
+</div>
 
-        <div class="col-md-4">
-            <label class="form-label">Jinsiga</label>
-            <select id="psex" class="form-control" required>
-                <option value="">Dooro...</option>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-            </select>
-            <div class="invalid-feedback">Dooro jinsiga.</div>
-        </div>
+<div id="registration-form-container" style="display: none;">
+    <div class="card shadow p-4">
+        <div class="row">
+            <form id="peopleForm" class="needs-validation" novalidate>
+                <input type="hidden" id="num" value="0">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Magaca oo Buuxa</label>
+                        <input type="text" id="pname" class="form-control" placeholder="Tusaale: Deeqa Maxamed" required>
+                        <div class="invalid-feedback">Fadlan magaca geli.</div>
+                    </div>
 
-        <div class="col-md-4">
-            <label class="form-label">Taariikhda Dhalashada</label>
-            <input type="date" id="birDate" class="form-control" required>
-            <div class="invalid-feedback">Geli taariikhda.</div>
-        </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Telefoonka</label>
+                        <input type="number" id="phone" class="form-control" placeholder="061xxxxxxx" required>
+                        <div class="invalid-feedback">Fadlan telefoonka geli.</div>
+                    </div>
 
-        <div class="col-md-4">
-            <label class="form-label">Goobta Dhalashada</label>
-            <input type="text" id="plbirth" class="form-control" placeholder="Mugadishu" required>
-            <div class="invalid-feedback">Geli goobta dhalashada.</div>
-        </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Jinsiga</label>
+                        <select id="psex" class="form-control" required>
+                            <option value="">Dooro...</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                        </select>
+                        <div class="invalid-feedback">Dooro jinsiga.</div>
+                    </div>
 
-        <div class="col-md-6">
-            <label class="form-label">Address-ka</label>
-            <select id="addno" class="form-control" required>
-                <option value="">Dooro Address...</option>
-            </select>
-            <div class="invalid-feedback">Fadlan dooro address.</div>
-        </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Taariikhda Dhalashada</label>
+                        <input type="date" id="birDate" class="form-control" required>
+                        <div class="invalid-feedback">Geli taariikhda.</div>
+                    </div>
 
-        <div class="col-md-6">
-            <label class="form-label">Gmail</label>
-            <input type="email" id="pgmail" class="form-control" placeholder="example@gmail.com" required>
-            <div class="invalid-feedback">Geli email sax ah.</div>
-        </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Goobta Dhalashada</label>
+                        <input type="text" id="plbirth" class="form-control" placeholder="Mugadishu" required>
+                        <div class="invalid-feedback">Geli goobta dhalashada.</div>
+                    </div>
 
-        <div class="col-12 mt-4 text-end">
-            <button type="button" id="btnSave" onclick="savePeople('insert')" class="btn btn-primary px-5">
-                <i class="fas fa-save"></i> Save
-            </button>
-            <button type="button"  class="btn btn-info" onclick="searchAndEdit()">
-                <i class="fas fa-edit"></i> Edit
-            </button>
-        </div>
-        <!-- <script src="/public/myscript.js"></script> -->
+                    <div class="col-md-6">
+                        <label class="form-label">Address-ka</label>
+                        <select id="addno" class="form-control" required>
+                            <option value="">Dooro Address...</option>
+                        </select>
+                        <div class="invalid-feedback">Fadlan dooro address.</div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Gmail</label>
+                        <input type="email" id="pgmail" class="form-control" placeholder="example@gmail.com" required>
+                        <div class="invalid-feedback">Geli email sax ah.</div>
+                    </div>
+
+                    <div class="d-flex justify-content-end mt-3">
+                        <button type="button" id="btnSave" class="btn btn-primary px-4" onclick="savePeople('insert')">
+                            <i class="fas fa-save"></i> Save
+                        </button>
+
+                        <button type="button" id="btnUpdate" class="btn btn-info px-4 ms-2" onclick="searchAndEdit()">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button type="button" class="btn btn-danger ms-2 px-4" onclick="resetFormToSave()">
+                            <i class="fas fa-times"></i> Cancel
+                        </button>
+                    </div>
+                </div>
+                </form>
+            </div>
     </div>
-    
-    <div class="card mt-4 mx-auto" style="width: 95%;">
+</div>
+</div>
+ <div class="card mt-4 mx-auto" style="width: 95%;" id="table-container">
         <div class="card-header bg-primary text-white py-2">
             <h5 class="mb-0">Registration Form</h5>
         </div>
         <div class="card-body p-0 table-responsive"> 
-            <table class="table table-striped table-hover ">
+            <table class="table table-striped table-hover  " >
                 <thead>
                     <tr>
                         <th>ID</th>
@@ -81,6 +101,5 @@
                 </table>
         </div>
     </div>
-    
 
-</form>
+    

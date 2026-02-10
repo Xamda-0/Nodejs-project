@@ -213,7 +213,7 @@ function searchAndEdit(id) {
             saveBtn.innerHTML = '<i class="fas fa-edit"></i> Update Changes';
             saveBtn.setAttribute("onclick", "savePeople('update')"); // Beddel logic-ga
             
-            alert("Xogtii waa la helay, hadda waad beddeli kartaa.");
+            // alert("Xogtii waa la helay, hadda waad beddeli kartaa.");
         } else {
             alert("Ma jiro qof leh ID-gaas: " + searchId);
         }
@@ -221,27 +221,17 @@ function searchAndEdit(id) {
     .catch(err => console.error("Search Error:", err));
 }
 function resetFormToSave() {
-    const form = document.getElementById('peopleForm');
-    
-    // 1. Sifee form-ka caadiga ah
-    form.reset();
-
-    // 2. Tirtir Search-ka (Target-ka saxda ah ee Input-ka sare)
-    const searchInput = document.querySelector('input[placeholder="Search ..."]');
-    if (searchInput) {
-        searchInput.value = ""; 
-    }
-
-    // 3. Hubi in ID-ga qarsoon uu noqdo 0
+    // 1. Sifee form-ka
+    document.getElementById('peopleForm').reset();
     document.getElementById("num").value = "0";
 
-    // 4. Batoonka 'Update' ku celi 'Save'
-    // Waxaan isticmaalaynaa ID-ga batoonka si uu 100% u shaqeeyo
-    const saveBtn = document.getElementById("btnSave"); // Hubi in batoonkaaga uu leeyahay id="btnSave"
-    if (saveBtn) {
-        saveBtn.innerHTML = '<i class="fas fa-save"></i> Save';
-        saveBtn.className = "btn btn-primary px-5";
-        saveBtn.setAttribute("onclick", "savePeople('insert')"); // Ku celi insert
+    // 2. Soo qabo batoonka adigoo isticmaalaya ID-ga rasmiga ah
+    const btn = document.getElementById("btnSave");
+    
+    if (btn) {
+        btn.innerHTML = '<i class="fas fa-save"></i> Save'; // Qoraalka beddel
+        btn.className = "btn btn-primary px-4"; // Midabka Buluugga ku soo celi
+        btn.setAttribute("onclick", "savePeople('insert')"); // Shaqada ku soo celi Insert
     }
 }
 function savePeople(operation) {
@@ -313,3 +303,18 @@ function deletePeople(id) {
 }
 
 
+
+function showForm() {
+    const formContainer = document.getElementById("registration-form-container");
+    
+    // Haddii uu qarsoonaa, soo bandhig
+    if (formContainer.style.display === "none") {
+        formContainer.style.display = "block";
+        
+        // Sidoo kale, waad sifeyn kartaa form-ka si uu diyaar u noqdo
+        resetFormToSave(); 
+    } else {
+        // Haddii aad rabto inaad dib u qariso marka mar kale la riixo
+        formContainer.style.display = "none";
+    }
+}
