@@ -89,11 +89,11 @@ function loadPeopleTable() {
                 const bDate = p.birthDate ? new Date(p.birthDate).toLocaleDateString() : '';
                 const rDate = p.regdate ? new Date(p.regdate).toLocaleDateString() : '';
                 return `
-                <tr>
+                <tr style="font-size: 13px;">
                     <td>${p.p_no}</td>
                     <td>${p.name}</td>
                     <td>${p.tell}</td>
-                    <td>${bDate}</td> <td>${p.placeBirth}</td> <td><span class="badge bg-secondary">${p.add_no}</span></td> <td>${p.gmail}</td><td><small class="text-muted">${rDate}</small></td> <td>
+                    <td>${bDate}</td> <td>${p.placeBirth}</td> <td>${p.add_no}</span></td> <td>${p.gmail}</td><td>${rDate}</td> 
                    
                 </tr>`;
             }).join('');
