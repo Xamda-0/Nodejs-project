@@ -224,6 +224,27 @@ app.post('/api/universal/execute', async (req, res) => {
         });
     }
 });
+// app.get('/api/get-table-id/:subname', async (req, res) => {
+//     const { subname } = req.params;
+
+//     // Haddii subname uu yahay 'undefined', jooji intaan error dhacin
+//     if (!subname || subname === 'undefined') {
+//         return res.json({ success: false, idName: 'id' });
+//     }
+
+//     try {
+//         const [results] = await conn.query(
+//             `SHOW KEYS FROM \`${subname}\` WHERE Key_name = 'PRIMARY'`
+//         );
+//         if (results.length > 0) {
+//             res.json({ success: true, idName: results[0].Column_name });
+//         } else {
+//             res.json({ success: false, idName: 'id' });
+//         }
+//     } catch (err) {
+//         res.status(500).json({ success: false, error: err.message });
+//     }
+// });
 app.listen(5000, () => {
     console.log("Server-ka wuxuu ku shaqeynayaa port 5000");
 });
