@@ -373,6 +373,119 @@ function openUniversalModal(tableName, idName) {
     myModal.show();
 }
 
+// async function loadDynamicTable(tableName, idName, containerId) {
+//     const response = await fetch('/api/universal/execute', {
+//         method: 'POST',
+//         headers: { 'Content-Type': 'application/json' },
+//         body: JSON.stringify({ 
+//             table: tableName, 
+//             oper: 'select', 
+//             idName: idName, 
+//             idVal: 0, 
+//             data: {} 
+//         })
+//     });
+
+//     const res = await response.json();
+
+//     // 1. SAXID: Hubi in res.data ay dhab ahaan u timid si uusan u dhicin length error
+//     if (res.success && res.data && res.data.length > 0) {
+//         const columns = Object.keys(res.data[0]); 
+
+//         let html = `
+//         <table class="table table-hover table-bordered shadow-sm">
+//             <thead class="bg-dark text-white">
+//                 <tr>
+//                     ${columns.map(col => `<th>${col.toUpperCase()}</th>`).join('')}
+//                     <th class="text-center">ACTION</th>
+//                 </tr>
+//             </thead>
+//             <tbody>
+//                 ${res.data.map(row => `
+//                 <tr>
+//                     ${columns.map(col => `<td>${row[col]}</td>`).join('')}
+//                     <td class="text-center">
+//                         <button class="btn btn-sm btn-info me-1" onclick="editRow('${tableName}', '${idName}', ${row[idName]})">
+//                             <i class="fas fa-edit"></i>
+//                         </button>
+//                         <button class="btn btn-sm btn-danger" onclick="deleteGeneric('${tableName}', '${idName}', ${row[idName]})">
+//                             <i class="fas fa-trash"></i>
+//                         </button>
+//                     </td>
+//                 </tr>`).join('')}
+//             </tbody>
+//         </table>`;
+//         document.getElementById(containerId).innerHTML = html;
+//     } else {
+//         // 2. SAXID: Farriin nadiif ah haddii table-ku faaruq yahay
+//         document.getElementById(containerId).innerHTML = `
+//             <div class="alert alert-info">Ma jirto xog hadda laga helay table-ka ${tableName}.</div>`;
+//     }
+// }
+// async function loadDynamicTable(tableName, idName, containerId) {
+//     const response = await fetch('/api/universal/execute', {
+//         method: 'POST',
+//         headers: { 'Content-Type': 'application/json' },
+//         body: JSON.stringify({ table: tableName, oper: 'select', idName: idName, idVal: 0, data: {} })
+//     });
+
+//     const res = await response.json();
+//     console.log("Xogta ka timid Server-ka:", res); // Tan fiiri F12 (Console)
+
+//     if (res.success && res.data && res.data.length > 0) {
+//         // ... dhis table-ka
+//             let html = `
+//             <table class="table table-hover table-bordered shadow-sm">
+//                 <thead class="bg-dark text-white">
+//                     <tr>
+//                         ${columns.map(col => `<th>${col.toUpperCase()}</th>`).join('')}
+//                         <th class="text-center">ACTION</th>
+//                     </tr>
+//                 </thead>
+//                 <tbody>
+//                     ${res.data.map(row => `
+//                     <tr>
+//                         ${columns.map(col => `<td>${row[col]}</td>`).join('')}
+//                         <td class="text-center">
+//                             <button class="btn btn-sm btn-info me-1" onclick="editRow('${tableName}', '${idName}', ${row[idName]})">
+//                                 <i class="fas fa-edit"></i>
+//                             </button>
+//                             <button class="btn btn-sm btn-danger" onclick="deleteGeneric('${tableName}', '${idName}', ${row[idName]})">
+//                                 <i class="fas fa-trash"></i>
+//                             </button>
+//                         </td>
+//                     </tr>`).join('')}
+//                 </tbody>
+//             </table>`;
+//             document.getElementById(containerId).innerHTML = html;
+//     } else {
+//         document.getElementById(containerId).innerHTML = `
+//             <div class="alert alert-info">Ma jirto xog hadda laga helay table-ka ${tableName}.</div>`;
+//     }
+// }
+// async function loadDynamicTable(tableName, idName, containerId) {
+//     const response = await fetch('/api/universal/execute', {
+//         method: 'POST',
+//         headers: { 'Content-Type': 'application/json' },
+//         body: JSON.stringify({ table: tableName, oper: 'select', idName: idName, idVal: 0, data: {} })
+//     });
+
+//     const res = await response.json();
+//     console.log("Xogta la helay:", res); // Hubi inay 'data' ku dhex jirto
+
+//     const container = document.getElementById(containerId);
+
+//     // Hubi haddii 'data' ay tahay Array iyo inay xog ku jirto
+//     if (res.success && Array.isArray(res.data) && res.data.length > 0) {
+//         const columns = Object.keys(res.data[0]);
+//         // ... Dhis Table-ka halkan (sida koodhkii hore)
+//     } else {
+//         container.innerHTML = `
+//             <div class="alert alert-info border-start border-4 border-info">
+//                 Ma jirto xog hadda laga helay table-ka ${tableName}.
+//             </div>`;
+//     }
+// }
 async function loadDynamicTable(tableName, idName, containerId) {
     const response = await fetch('/api/universal/execute', {
         method: 'POST',
@@ -381,85 +494,237 @@ async function loadDynamicTable(tableName, idName, containerId) {
     });
 
     const res = await response.json();
-    if (res.success && res.data.length > 0) {
-        const columns = Object.keys(res.data[0]); // Iskiis u hel tiirarka
+    console.log("Xogta ka timid Server-ka:", res); // Tan fiiri F12 (Console)
 
-        let html = `
-        <table class="table table-hover">
-            <thead class="bg-dark text-white">
-                <tr>
-                    ${columns.map(col => `<th>${col}</th>`).join('')}
-                    <th>ACTION</th>
-                </tr>
-            </thead>
-            <tbody>
-                ${res.data.map(row => `
-                <tr>
-                    ${columns.map(col => `<td>${row[col]}</td>`).join('')}
-                    <td>
-                        <button class="btn btn-sm btn-info" onclick="editRow('${tableName}', '${idName}', ${row[idName]})"><i class="fas fa-edit"></i></button>
-                    </td>
-                </tr>`).join('')}
-            </tbody>
-        </table>`;
-        document.getElementById(containerId).innerHTML = html;
-    }
-}
-
-async function saveData() {
-    // Ka soo qaad magaca table-ka hidden input-ka aan kor ku sameynay
-    const tableName = document.getElementById("hiddenTableName").value;
-    const idName = document.getElementById("hiddenIdName").value;
-    const idVal = document.getElementById("hiddenIdVal").value;
-
-    if (!tableName) {
-        alert("Cillad: Magaca table-ka lama helin!");
-        return;
-    }
-
-    const oper = (idVal == "0") ? "insert" : "update";
-    const data = {};
-    document.querySelectorAll(".dynamic-input").forEach(input => {
-        const fieldName = input.id.replace("inp_", "");
-        data[fieldName] = input.value;
-    });
-
-    const body = {
-        table: tableName, // Hadda waa 'job' oo sugan
-        oper: oper,
-        idName: idName,
-        idVal: idVal,
-        data: data
-    };
-
-    const response = await fetch('/api/universal/execute', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
-    });
-
-    const res = await response.json();
-    if (res.success) {
-        alert("Si guul leh ayaa loo kaydiyay!");
-        bootstrap.Modal.getInstance(document.getElementById('universalModal')).hide();
-        loadDynamicTable(tableName, idName, 'tableContainer');
+    if (res.success && res.data && res.data.length > 0) {
+        const columns = Object.keys(res.data[0]);
+        // ... dhis table-ka
+            let html = `
+            <table class="table table-hover table-bordered shadow-sm">
+                <thead class="bg-dark text-white">
+                    <tr>
+                        ${columns.map(col => `<th>${col.toUpperCase()}</th>`).join('')}
+                        <th class="text-center">ACTION</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${res.data.map(row => `
+                    <tr>
+                        ${columns.map(col => `<td>${row[col]}</td>`).join('')}
+                        <td class="text-center">
+                            <button class="btn btn-sm btn-info me-1" onclick="editRow('${tableName}', '${idName}', ${row[idName]})">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteGeneric('${tableName}', '${idName}', ${row[idName]})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>`).join('')}
+                </tbody>
+            </table>`;
+            document.getElementById(containerId).innerHTML = html;
     } else {
-        alert("Error: " + res.error);
+        document.getElementById(containerId).innerHTML = `
+            <div class="alert alert-info">Ma jirto xog hadda laga helay table-ka ${tableName}.</div>`;
     }
 }
+//     const tableName = document.getElementById("hiddenTableName").value;
+//     const idName = document.getElementById("hiddenIdName").value;
+//     const idVal = document.getElementById("hiddenIdVal").value;
+
+//     if (!tableName) {
+//         alert("Error: Magaca table-ka waa lagama maarmaan!");
+//         return;
+//     }
+
+//     const oper = (idVal == "0") ? "insert" : "update";
+//     const data = {};
+    
+//     // Ururi xogta inputs-ka
+//     document.querySelectorAll(".dynamic-input").forEach(input => {
+//         const fieldName = input.id.replace("inp_", "");
+//         data[fieldName] = input.value;
+//     });
+
+//     const body = {
+//         table: tableName,
+//         oper: oper,
+//         idName: idName,
+//         idVal: idVal,
+//         data: data
+//     };
+
+//     try {
+//         const response = await fetch('/api/universal/execute', {
+//             method: 'POST',
+//             headers: { 'Content-Type': 'application/json' },
+//             body: JSON.stringify(body)
+//         });
+
+//         const res = await response.json();
+
+//         if (res.success) {
+//             // 1. Soo saar farriinta ka timid Procedure-ka (e.g., 'Insert Success' ama 'Already Exists')
+//             alert(res.message);
+
+//             // 2. Modal-ka xir KALIYA haddii hawlgalku guulaysan yahay
+//             // Waxaan hubineynaa in farriinta ay ku jirto ereyga 'Success'
+//            if (res.message.toLowerCase().includes("success")) {
+//                 bootstrap.Modal.getInstance(document.getElementById('universalModal')).hide();
+                
+//                 // Haddii uu table-ka hadda qofka u furan yahay, dib u load-garee xogta cusub
+//                 const container = document.getElementById('tableContainer');
+//                 if (container.style.display === "block") {
+//                     loadDynamicTable(tableName, idName, 'tableContainer');
+//                 }
+//             } else {
+//                 // Haddii ay tahay 'Already Exists', Modal-ku wuu furnaanayaa
+//                 console.log("Xogtaan horay ayay u jirtay, modal-ka lama xirayo.");
+//             }
+//         } else {
+//             // Haddii uu jiro SQL Error (Syntax ama Connection)
+//             alert("Cillad Server: " + res.error);
+//         }
+//     } catch (err) {
+//         console.error("Fetch Error:", err);
+//         alert("Xiriirka server-ka ayaa go'an!");
+//     }
+// }
+// async function saveData() {
+//     // ... (Code-kii hore ee ururinta xogta)
+
+//     const response = await fetch('/api/universal/execute', {
+//         method: 'POST',
+//         headers: { 'Content-Type': 'application/json' },
+//         body: JSON.stringify(body)
+//     });
+
+//     const res = await response.json();
+
+//     if (res.success) {
+//         // 1. Alert-garee farriinta dhabta ah ee ka timid Procedure-ka (Ma jiro wax kale)
+//         alert(res.message); 
+
+//         // 2. Modal-ka xir kaliya haddii uu farriintu tahay 'Success'
+//         if (res.message.toLowerCase().includes("success")) {
+//             bootstrap.Modal.getInstance(document.getElementById('universalModal')).hide();
+//             loadDynamicTable(tableName, idName, 'tableContainer');
+//         } else {
+//             // Haddii ay tahay 'Already Exists', modal-ku wuu furnaanayaa
+//             console.log("Database Response:", res.message);
+//         }
+//     } else {
+//         alert("Error: " + res.error);
+//     }
+// }
 
 
+// function openModal(tableName, idName, data = null) {
+//     currentTable = tableName;
+//     document.getElementById("modalTitle").innerText = `Maamulka ${tableName.toUpperCase()}`;
+//     document.getElementById("hiddenIdName").value = idName;
+//     document.getElementById("hiddenIdVal").value = data ? data[idName] : "0";
+//     const inputContainer = document.getElementById("dynamicInputs");
+//     inputContainer.innerHTML = ""; // Nadiifi wixii hore
+
+//     // 1. Haddii aanay xog jirin (New Insert), soo aqri column-yada meel kale ama manual
+//     // Halkan waxaan ka soo qaadanaynaa "Keys" haddii ay xog jirto ama qaab manual ah
+//     const fields = data ? Object.keys(data) : getFieldsForTable(tableName);
+
+//     fields.forEach(field => {
+//         // PK-ga ha u samayn input muuqda
+//         if (field !== idName) {
+//             inputContainer.innerHTML += `
+//                 <div class="mb-3">
+//                     <label class="form-label">${field.toUpperCase()}</label>
+//                     <input type="text" class="form-control dynamic-input" id="inp_${field}" 
+//                            value="${data ? data[field] : ''}">
+//                 </div>`;
+//         } else if (data) {
+//             document.getElementById("hiddenIdVal").value = data[idName];
+//         }
+//     });
+
+//     const myModal = new bootstrap.Modal(document.getElementById('universalModal'));
+//     myModal.show();
+// }
+
+// 3. SAXID: Function-kan ayaa modal-ka u sheegaya tiirarka (columns) uu dhisayo markay xogtu cusub tahay
+function getFieldsForTable(tableName) {
+    const tableStructure = {
+        'jobs': ['title', 'salary'], // Sida sawirkaaga ka muuqata
+        'staff_type': ['st_name'],
+        'specialization': ['s_name'],
+        'degree': ['d_name']
+        // Halkan ku dar 17-kaaga table mid kasta iyo columns-kiisa
+    };
+    return tableStructure[tableName] || [];
+}
+// async function saveData() {
+//     // 1. Soo qaado xogta muhiimka ah ee modal-ka ku jirta
+//     const tableName = document.getElementById("hiddenTableName").value;
+//     const idName = document.getElementById("hiddenIdName").value;
+//     const idVal = document.getElementById("hiddenIdVal").value;
+
+//     const oper = (idVal == "0") ? "insert" : "update";
+//     const data = {};
+    
+//     // 2. Ururi xogta dhammaan inputs-ka leh class-ka 'dynamic-input'
+//     document.querySelectorAll(".dynamic-input").forEach(input => {
+//         const fieldName = input.id.replace("inp_", "");
+//         data[fieldName] = input.value;
+//     });
+
+//     // 3. SAXID: Halkan ayaad ku ilowday inaad qeexdo 'body'
+//     const body = {
+//         table: tableName,
+//         oper: oper,
+//         idName: idName,
+//         idVal: idVal,
+//         data: data
+//     };
+
+//     try {
+//         // 4. Hadda 'body' waa la qeexay, ReferenceError-kaas ma dhici doono
+//         const response = await fetch('/api/universal/execute', {
+//             method: 'POST',
+//             headers: { 'Content-Type': 'application/json' },
+//             body: JSON.stringify(body) // Halkan ayuu error-ku ka dhacayay
+//         });
+
+//         const res = await response.json();
+
+//         if (res.success) {
+//             alert(res.message); // Soo bandhig fariinta dhabta ah
+
+//             if (res.message.includes("success")) {
+//                 // Xir modal-ka kaliya haddii ay guul tahay
+//                 const modalElement = document.getElementById('universalModal');
+//                 const modalInstance = bootstrap.Modal.getInstance(modalElement);
+//                 if (modalInstance) modalInstance.hide();
+
+//                 // Dib u load-garee xogta table-ka
+//                 loadDynamicTable(tableName, idName, 'tableContainer');
+//             }
+//         }
+//     } catch (err) {
+//         console.error("Save Error:", err);
+//     }
+// }
 
 function openModal(tableName, idName, data = null) {
     currentTable = tableName;
-    document.getElementById("modalTitle").innerText = `Maamulka ${tableName.toUpperCase()}`;
+    document.getElementById("modalTitle").innerText = `Maamulka ${tableName}`;
+    
+    // 1. SAXID: Ku shub magaca table-ka hidden input-ka
+    document.getElementById("hiddenTableName").value = tableName; 
     document.getElementById("hiddenIdName").value = idName;
+    document.getElementById("hiddenIdVal").value = data ? data[idName] : "0";
     
     const inputContainer = document.getElementById("dynamicInputs");
     inputContainer.innerHTML = ""; // Nadiifi wixii hore
 
-    // 1. Haddii aanay xog jirin (New Insert), soo aqri column-yada meel kale ama manual
-    // Halkan waxaan ka soo qaadanaynaa "Keys" haddii ay xog jirto ama qaab manual ah
+    // 2. SAXID: Haddii xog (data) la waayo, u yeer getFieldsForTable si modal-ku u dhismo
     const fields = data ? Object.keys(data) : getFieldsForTable(tableName);
 
     fields.forEach(field => {
@@ -467,31 +732,161 @@ function openModal(tableName, idName, data = null) {
         if (field !== idName) {
             inputContainer.innerHTML += `
                 <div class="mb-3">
-                    <label class="form-label">${field.toUpperCase()}</label>
-                    <input type="text" class="form-control dynamic-input" id="inp_${field}" 
+                    <label class="form-label">${field}</label>
+                    <input type="text" class="form-control dynamic-input" id="${field}" 
+                           placeholder="Gali ${field}" 
                            value="${data ? data[field] : ''}">
                 </div>`;
-        } else if (data) {
-            document.getElementById("hiddenIdVal").value = data[idName];
         }
     });
 
     const myModal = new bootstrap.Modal(document.getElementById('universalModal'));
     myModal.show();
 }
+async function saveData() {
+    try {
+        // 1. Soo qaado xogta muhiimka ah ee ku dhex qarson Modal-ka
+        const tableName = document.getElementById("hiddenTableName").value;
+        const idName = document.getElementById("hiddenIdName").value;
+        const idVal = document.getElementById("hiddenIdVal").value;
 
-// Function-kan wuxuu kuu fududaynayaa inaad u sheegto table walba waxa uu leeyahay
-function getFieldsForTable(table) {
-    const schemas = {
-        'jobs': ['title', 'salary'],
-        'staff_type': ['tyname'],
-        'specilization': ['spname', 'description'],
-        'degree': ['degname', 'description'],
-        'country': ['contName', 'stateName', 'city'],
-        'status': ['stname'],
-        'accounts':['acc_name','institution','balance'],
-        'salary_charge':['stf_no','amount','sal_date','description'],
-        'salary_payment':['sal_ch_no','amount','sal_date','acc_no']
-    };
-    return schemas[table] || [];
+        // Hubi in tableName uu jiro si aanu 500 Error ugu dhicin Server-ka
+        if (!tableName) {
+            alert("Cillad: Magaca table-ka lama helin!");
+            return;
+        }
+
+        const oper = (idVal == "0") ? "insert" : "update";
+        const data = {};
+        
+        // 2. Ururi xogta dhammaan inputs-ka leh class-ka 'dynamic-input'
+        const inputs = document.querySelectorAll(".dynamic-input");
+        inputs.forEach(input => {
+            const fieldName = input.id.replace("inp_", "");
+            data[fieldName] = input.value;
+        });
+
+        // 3. SAXID: Halkan ayaan ku qeexnay 'body' si looga fogaado ReferenceError
+        const body = {
+            table: tableName,
+            oper: oper,
+            idName: idName,
+            idVal: idVal,
+            data: data
+        };
+
+        // 4. U dir xogta API-ga
+        const response = await fetch('/api/universal/execute', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
+
+        const res = await response.json();
+
+        // 5. Maaree Jawaabta (Success ama Failure)
+        if (res.success) {
+            // Soo bandhig fariinta dhabta ah (Success ama Already Exists)
+            alert(res.message); 
+
+            // Modal-ka xir kaliya haddii fariintu ay ku jirto ereyga 'success'
+            if (res.message.toLowerCase().includes("success")) {
+                const modalElement = document.getElementById('universalModal');
+                const modalInstance = bootstrap.Modal.getInstance(modalElement);
+                
+                if (modalInstance) {
+                    modalInstance.hide();
+                }
+
+                // Dib u load-garee xogta table-ka si aad u aragto isbeddelka
+                loadDynamicTable(tableName, idName, 'tableContainer');
+            } else {
+                console.log("Xogta lama kaydin: ", res.message);
+            }
+        } else {
+            // Haddii uu jiro SQL Error (Tani waxay badalaysaa 500 Error-ka aamusnaanta ah)
+            alert("Bug ka yimid Database-ka: " + res.error);
+            console.error("Debug Info:", res);
+        }
+
+    } catch (err) {
+        console.error("Save Error:", err);
+        // alert("Xiriirka Server-ka waa go'an yahay ama code-ka ayaa qalad leh.");
+    }
+}
+async function deleteGeneric(tableName, idName, idValue) {
+    // 1. Weydiiso qofka xaqiijin (Confirmation)
+    if (!confirm(`Ma hubtaa inaad tirtirto xogtan ku jirta table-ka ${tableName}?`)) return;
+
+    const response = await fetch('/api/universal/execute', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            table: tableName,
+            oper: 'delete', // Procedure-ka wuxuu isticmaali doonaa qaybta Delete
+            idName: idName,
+            idVal: idValue,
+            data: {}
+        })
+    });
+
+    const res = await response.json();
+    if (res.success) {
+        alert(res.message);
+        // 2. Dib u rari table-ka si xariiqii tirtirmay u baxo
+        loadDynamicTable(tableName, idName, 'tableContainer');
+    } else {
+        alert("Error: " + res.error);
+    }
+}
+function toggleTable(tableName, idName) {
+    const container = document.getElementById('tableContainer');
+    const btn = document.getElementById('btnToggleTable');
+
+    if (container.style.display === "none") {
+        // 1. Soo rari xogta haddii uu table-ku xirnaa
+        loadDynamicTable(tableName, idName, 'tableContainer');
+        
+        // 2. Muuji container-ka oo beddel batoonka
+        container.style.display = "block";
+        btn.innerHTML = `<i class="fas fa-eye-slash"></i> Hide Data`;
+        btn.className = "btn btn-warning btn-sm"; // Beddel midabka si loo dareemo
+    } else {
+        // 3. Qari container-ka haddii uu furnaa
+        container.style.display = "none";
+        btn.innerHTML = `<i class="fas fa-eye"></i> Show Data`;
+        btn.className = "btn btn-info btn-sm";
+    }
+}
+function editRow(tableName, idName, idVal) {
+    // 1. Raadi dhammaan xogta table-ka ee hadda ku dhex jirta 'tableContainer'
+    // Waxaan u isticmaalaynaa xogta hadda muuqata si aanan Server-ka mar kale u wicin (Fast Edit)
+    const table = document.querySelector("#tableContainer table");
+    const rows = Array.from(table.querySelectorAll("tbody tr"));
+
+    // 2. Soo saar xogta xariiqda (row) saxda ah adoo eegaya ID-ga
+    const rowToEdit = rows.find(row => {
+        // Waxaan u qaadanaynaa in ID-gu yahay tiirka (column) u horreeya
+        return row.cells[0].innerText == idVal; 
+    });
+
+    if (rowToEdit) {
+        const data = {};
+        const headers = Array.from(table.querySelectorAll("thead th"));
+
+        // 3. Khariiddee (Map) xogta tiirarka iyo qiyamkooda
+        headers.forEach((header, index) => {
+            const columnName = header.innerText.toLowerCase();
+            if (columnName !== 'action') {
+                data[columnName] = rowToEdit.cells[index].innerText;
+            }
+        });
+
+        console.log("Xogta la rabo in la edit-gareeyo:", data);
+
+        // 4. Fur Modal-ka adoo u diraya xogta (data) si uu u buuxiyo inputs-ka
+        openModal(tableName, idName, data);
+    } else {
+        alert("Waan ka xunnahay, xogta xariiqdaas lama helin!");
+    }
 }

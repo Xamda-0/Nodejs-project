@@ -178,27 +178,50 @@ app.post('/api/people/execute', async (req, res) => {
         return res.status(500).json({ success: false, error: err.message });
     }
 });
+
 app.post('/api/universal/execute', async (req, res) => {
     try {
         const { table, oper, idName, idVal, data } = req.body;
 
-        // 1. Hubi haddii magaca table-ka uu maqan yahay
-        if (!table) {
-            return res.status(400).json({ success: false, error: "Magaca table-ka waa lagama maarmaan!" });
+        let sql;
+        let params = [];
+
+        if (oper === 'select' || oper === 'delete') {
+            // 1. Nidaamka 6-da Parameter (sp_UniversalCRUD)
+            sql = "CALL sp_UniversalCRUD(?, ?, ?, ?, ?, ?)";
+            params = [table, oper, '', '', idName, idVal || 0];
+        } else {
+            // 2. Nidaamka Generic-ga ah (sp_jobs iyo kuwa kale)
+            
+            // Waxaan ka soo saarnaa qiyamka (values) ay 'data' u xambaarsan tahay
+            // Tusaale: data = { title: 'Dev', salary: 350 } -> ['Dev', 350]
+            const dataValues = data ? Object.values(data) : [];
+            
+            // Waxaan ku darnaa 'oper' iyo 'idVal' (num) dhamaadka
+            params = [...dataValues, oper, idVal || 0];
+
+            // Waxaan dhisnaa "???" waafaqsan inta parameter ee 'params' ku jira
+            // Tusaale: 4 parameters -> CALL sp_jobs(?, ?, ?, ?)
+            const placeholders = params.map(() => "?").join(", ");
+            sql = `CALL ${table}(${placeholders})`;
         }
 
-        console.log(`Executing ${oper} on table: ${table}`);
+        console.log(`Executing SQL: ${sql} with params:`, params);
 
-        const cols = Object.keys(data).join(',');
-        const vals = Object.values(data).map(v => `'${v}'`).join(',');
+        const [results] = await conn.query(sql, params);
 
-        const sql = "CALL sp_UniversalCRUD(?, ?, ?, ?, ?, ?)";
-        const [result] = await conn.query(sql, [table, oper, cols, vals, idName, idVal || 0]);
-
-        res.json({ success: true, message: "Si guul leh ayaa loo keydiyay" });
+        if (oper === 'select') {
+            return res.json({ success: true, data: results[0] });
+        } else {
+            const msg = (results[0] && results[0][0]) ? results[0][0].msg : "Success";
+            return res.json({ success: true, message: msg });
+        }
     } catch (err) {
-        console.error("SQL Error Details:", err.message);
-        res.status(500).json({ success: false, error: err.sqlMessage || err.message });
+        console.error("Bug Detected:", err.sqlMessage || err.message);
+        res.status(200).json({ 
+            success: false, 
+            error: err.sqlMessage || err.message 
+        });
     }
 });
 app.listen(5000, () => {
