@@ -54,8 +54,12 @@ function togglePeopleTable() {
     if (container.style.display === "none") {
         container.style.display = "block"; // Muuji table-ka
         loadPeopleTable(); // Isla markiiba soo rari xogta
+        // btn.innerHTML = `<i class="fas fa-eye-slash"></i> Hide Data`;
+        // btn.className = "btn btn-warning btn-sm";
     } else {
         container.style.display = "none"; // Qari haddii uu furnaa
+        // btn.innerHTML = `<i class="fas fa-eye"></i> Show Data`;
+        // btn.className = "btn btn-info btn-sm";
     }
 }
     function navigateTo(url) {
