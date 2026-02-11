@@ -1,3 +1,17 @@
-<button class="btn btn-primary" onclick="openUniversalModal('degree', 'deg_no')">
-    <i class="fas fa-plus"></i> Add New Degree
-</button>
+
+    <div class="card p-3 shadow-sm mb-4">
+    <div class="d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Maamulka Degrees</h5>
+        <div>
+            <button class="btn btn-primary btn-sm" onclick="openUniversalModal('degree', 'deg_no')">
+                <i class="fas fa-plus"></i> Add Degree
+            </button>
+            <button id="btnToggleTable" class="btn btn-info btn-sm" onclick="toggleTable('degree', 'deg_no')">
+                <i class="fas fa-eye"></i> Show Data
+            </button>
+        </div>
+    </div>
+</div>
+
+<div id="tableContainer" class="table-responsive mt-3" style="display: none;">
+    </div>
