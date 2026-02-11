@@ -883,28 +883,28 @@
       });
     </script>
     <div class="modal fade" id="universalModal" tabindex="-1" data-bs-focus="false" aria-hidden="true">
-  <div class="modal-dialog modal-lg"> <div class="modal-content">
-      <div class="modal-header bg-primary text-white">
-        <h5 class="modal-title" id="modalTitle">Maamulka Xogta</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <form id="universalForm">
-          <div id="dynamicInputs" class="row"></div>
-          
-          <input type="hidden" id="hiddenIdName">
-          <input type="hidden" id="hiddenIdVal" value="0">
-        </form>
-      </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Ka noqo</button>
-          <button type="button" class="btn btn-success" onclick="saveData()">
-              <i class="fas fa-save"></i>save
-          </button>
+      <div class="modal-dialog modal-lg"> <div class="modal-content">
+          <div class="modal-header bg-primary text-white">
+            <h5 class="modal-title" id="modalTitle">Maamulka Xogta</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form id="universalForm">
+              <div id="dynamicInputs" class="row"></div>
+              <input type="hidden" id="hiddenTableName">
+              <input type="hidden" id="hiddenIdName">
+              <input type="hidden" id="hiddenIdVal" value="0" >
+            </form>
+          </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+              <button type="button" class="btn btn-success" onclick="saveData()">
+                  <i class="fas fa-save"></i> Save
+              </button>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
     <script src="myscript.js"></script>
   </body>
 </html>

@@ -326,25 +326,39 @@ function showForm() {
 let currentTable = ""; // Table-ka hadda la furay
 // 1. Qeex xogta table- walba (Schemas)
 const tableSchemas = {
-    'job': ['title', 'salary'],
+    'jobs': ['title', 'salary'],
+    'staff_type': ['tyname'],
     'degree': ['degname', 'description'],
     'country': ['contName', 'stateName', 'city'],
     'status': ['stname'],
-    'specialization': ['spname', 'description']
+    'specilization': ['spname', 'description'],
+    'accounts':['acc_name','institution','balance'],
+    'salary_charge':['stf_no','amount','sal_date','description'],
+    'salary_payment':['sal_ch_no','amount','sal_date','acc_no']
 };
 
 // 2. Function-ka furaya Modal-ka
 function openUniversalModal(tableName, idName) {
     const container = document.getElementById("dynamicInputs");
-    container.innerHTML = ""; // Nadiifi wixii hore
+    container.innerHTML = ""; 
+
+    // 1. Hubi haddii schema-ga table-kan uu jiro
+    const fields = tableSchemas[tableName];
     
-    // U sheeg hidden inputs-ka xogta hadda la rabo
+    if (!fields) {
+        console.error(`Cillad: Table-ka '${tableName}' kuma jiro tableSchemas!`);
+        alert(`Cillad farsamo: Schema-ga '${tableName}' lama helin.`);
+        return; // Ha furin modal-ka haddii xogta la waayo
+    }
+
+    // 2. Ku shub xogta hidden inputs-ka
+    document.getElementById("hiddenTableName").value = tableName; 
     document.getElementById("hiddenIdName").value = idName;
+    document.getElementById("hiddenIdVal").value = "0"; 
+    
     document.getElementById("modalTitle").innerText = `Maamulka ${tableName}`;
     
-    // Soo saar tiirarka (fields) table-kan leeyahay
-    const fields = tableSchemas[tableName] || [];
-    
+    // 3. Dhis inputs-ka
     fields.forEach(field => {
         container.innerHTML += `
             <div class="col-md-12 mb-3">
@@ -353,8 +367,9 @@ function openUniversalModal(tableName, idName) {
             </div>`;
     });
 
-    // Fur Modal-ka
-    const myModal = new bootstrap.Modal(document.getElementById('universalModal'));
+    // 4. Hadda fur modal-ka maadaama xogtu diyaar tahay
+    const modalElement = document.getElementById('universalModal');
+    const myModal = new bootstrap.Modal(modalElement);
     myModal.show();
 }
 
@@ -373,7 +388,7 @@ async function loadDynamicTable(tableName, idName, containerId) {
         <table class="table table-hover">
             <thead class="bg-dark text-white">
                 <tr>
-                    ${columns.map(col => `<th>${col.toUpperCase()}</th>`).join('')}
+                    ${columns.map(col => `<th>${col}</th>`).join('')}
                     <th>ACTION</th>
                 </tr>
             </thead>
@@ -392,10 +407,17 @@ async function loadDynamicTable(tableName, idName, containerId) {
 }
 
 async function saveData() {
+    // Ka soo qaad magaca table-ka hidden input-ka aan kor ku sameynay
+    const tableName = document.getElementById("hiddenTableName").value;
     const idName = document.getElementById("hiddenIdName").value;
     const idVal = document.getElementById("hiddenIdVal").value;
-    const oper = (idVal == "0") ? "insert" : "update";
 
+    if (!tableName) {
+        alert("Cillad: Magaca table-ka lama helin!");
+        return;
+    }
+
+    const oper = (idVal == "0") ? "insert" : "update";
     const data = {};
     document.querySelectorAll(".dynamic-input").forEach(input => {
         const fieldName = input.id.replace("inp_", "");
@@ -403,39 +425,26 @@ async function saveData() {
     });
 
     const body = {
-        table: currentTable, // Hubi in kan lagu soo qabto openModal()
+        table: tableName, // Hadda waa 'job' oo sugan
         oper: oper,
         idName: idName,
         idVal: idVal,
         data: data
     };
 
-    try {
-        const response = await fetch('/api/universal/execute', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(body)
-        });
+    const response = await fetch('/api/universal/execute', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+    });
 
-        const res = await response.json();
-        if (res.success) {
-            alert("Si guul leh ayaa loo kaydiyay!");
-            
-            // 1. Xir Modal-ka
-            const modalElement = document.getElementById('universalModal');
-            const modalInstance = bootstrap.Modal.getInstance(modalElement);
-            if (modalInstance) modalInstance.hide();
-
-            // 2. Nadiifi Focus-ka
-            document.activeElement.blur();
-
-            // 3. Dib u rari Table-ka (KALIYA HAL JEER WAC)
-            loadDynamicTable(currentTable, idName, 'tableContainer');
-        } else {
-            alert("Error: " + res.error); // U sheeg qofka haddii SQL syntax dhaco
-        }
-    } catch (err) {
-        console.error("SaveData Error:", err);
+    const res = await response.json();
+    if (res.success) {
+        alert("Si guul leh ayaa loo kaydiyay!");
+        bootstrap.Modal.getInstance(document.getElementById('universalModal')).hide();
+        loadDynamicTable(tableName, idName, 'tableContainer');
+    } else {
+        alert("Error: " + res.error);
     }
 }
 
@@ -475,9 +484,14 @@ function openModal(tableName, idName, data = null) {
 function getFieldsForTable(table) {
     const schemas = {
         'jobs': ['title', 'salary'],
+        'staff_type': ['tyname'],
+        'specilization': ['spname', 'description'],
         'degree': ['degname', 'description'],
         'country': ['contName', 'stateName', 'city'],
-        'status': ['stname']
+        'status': ['stname'],
+        'accounts':['acc_name','institution','balance'],
+        'salary_charge':['stf_no','amount','sal_date','description'],
+        'salary_payment':['sal_ch_no','amount','sal_date','acc_no']
     };
     return schemas[table] || [];
 }
